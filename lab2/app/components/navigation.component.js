@@ -15,7 +15,7 @@ var NavigationComponent = (function () {
     NavigationComponent = __decorate([
         core_1.Component({
             selector: 'navigation',
-            template: "\n        <nav aria-labelledby=\"navigationheadline\">\n            <h2 class=\"accessibility\" id=\"navigationheadline\">Navigation</h2>\n    \n            <ul class=\"navigation-list\" ng-show=\"isActive('/')\">\n    \n                <li class=\"nav-items\">\n                    <ul>\n                        <li>\n                            <a routerLink=\"/options\" class=\"button\" accesskey=\"2\">Optionen</a>\n                        </li>\n                        <li>\n                            <a routerLink=\"/login\" class=\"button\" accesskey=\"1\">Abmelden</a>\n                        </li>\n                    </ul>\n                </li>\n                <li class=\"overflow-icon\">\n                    <a href=\"#\" class=\"button\" accesskey=\"1\">\u2630</a>\n                </li>\n            </ul>\n        </nav>\n        "
+            templateUrl: '/app/views/navigation.html',
         }), 
         __metadata('design:paramtypes', [])
     ], NavigationComponent);
