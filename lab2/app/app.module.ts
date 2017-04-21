@@ -13,7 +13,7 @@ import {NavigationComponent} from "./components/navigation.component";
 import {DeviceService} from "./services/device.service";
 
 const routes: Routes = [
-  { path: '', redirectTo: '/', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'overview', component: OverviewComponent },
   { path: 'options', component: OptionsComponent },

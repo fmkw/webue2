@@ -21,7 +21,7 @@ var details_component_1 = require("./components/details.component");
 var navigation_component_1 = require("./components/navigation.component");
 var device_service_1 = require("./services/device.service");
 var routes = [
-    { path: '', redirectTo: '/', pathMatch: 'full' },
+    { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: login_component_1.LoginComponent },
     { path: 'overview', component: overview_component_1.OverviewComponent },
     { path: 'options', component: options_component_1.OptionsComponent },

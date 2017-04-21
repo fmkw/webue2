@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {Router} from '@angular/router';
 
 @Component({
     moduleId: module.id,
@@ -9,12 +10,14 @@ import {Component} from '@angular/core';
         </div>
         
         <header aria-labelledby="bannerheadline">
-            <a routerLink="/overview"><img class="title-image" src="../../images/big-logo-small.png" alt="BIG Smart Home logo"></a>
+            <a (click)="checkPermission()"><img class="title-image" src="../../images/big-logo-small.png" alt="BIG Smart Home logo"></a>
         
             <h1 class="header-title" id="bannerheadline">
                 BIG Smart Home
             </h1>
-            <navigation></navigation>
+            <div *ngIf="showNavigation">
+                <navigation></navigation>
+            </div>
         </header>
         <div class="main-container">
             <router-outlet></router-outlet>
@@ -26,7 +29,16 @@ import {Component} from '@angular/core';
 })
 
 export class AppComponent {
+    showNavigation : boolean;
 
+    constructor(private router: Router) {
+        
+    }
+
+    checkPermission() {
+        if( this.router.url != '/login')
+            this.router.navigate(['/overview']);
+    }
 }
 
 

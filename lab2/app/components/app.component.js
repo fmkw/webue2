@@ -9,16 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var router_1 = require('@angular/router');
 var AppComponent = (function () {
-    function AppComponent() {
+    function AppComponent(router) {
+        this.router = router;
     }
+    AppComponent.prototype.checkPermission = function () {
+        if (this.router.url != '/login')
+            this.router.navigate(['/overview']);
+    };
     AppComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'my-app',
-            template: "\n        <div role=\"navigation\" aria-label=\"jumplinks\">\n            <a href=\"#devicesheadline\" class=\"accessibility\">Zum Inhalt springen</a>\n        </div>\n        \n        <header aria-labelledby=\"bannerheadline\">\n            <a routerLink=\"/overview\"><img class=\"title-image\" src=\"../../images/big-logo-small.png\" alt=\"BIG Smart Home logo\"></a>\n        \n            <h1 class=\"header-title\" id=\"bannerheadline\">\n                BIG Smart Home\n            </h1>\n            <navigation></navigation>\n        </header>\n        <div class=\"main-container\">\n            <router-outlet></router-outlet>\n        </div>\n        <footer>\n            \u00A9 2017 BIG Smart Home\n        </footer>\n        ",
+            template: "\n        <div role=\"navigation\" aria-label=\"jumplinks\">\n            <a href=\"#devicesheadline\" class=\"accessibility\">Zum Inhalt springen</a>\n        </div>\n        \n        <header aria-labelledby=\"bannerheadline\">\n            <a (click)=\"checkPermission()\"><img class=\"title-image\" src=\"../../images/big-logo-small.png\" alt=\"BIG Smart Home logo\"></a>\n        \n            <h1 class=\"header-title\" id=\"bannerheadline\">\n                BIG Smart Home\n            </h1>\n            <div *ngIf=\"showNavigation\">\n                <navigation></navigation>\n            </div>\n        </header>\n        <div class=\"main-container\">\n            <router-outlet></router-outlet>\n        </div>\n        <footer>\n            \u00A9 2017 BIG Smart Home\n        </footer>\n        ",
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [router_1.Router])
     ], AppComponent);
     return AppComponent;
 }());
