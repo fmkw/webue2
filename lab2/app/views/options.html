@@ -1,12 +1,91 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>BIG Smart Home - Optionen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../../styles/style.css">
+  <script type="text/javascript">
+      function value(){
+          var oldPassword = document.getElementById('old-password-input').value;
+          var newPassword = document.getElementById('new-password-input').value;
+          var repeatPassword = document.getElementById('repeat-password-input').value;
+          if(oldPassword === "" || newPassword === "" || repeatPassword === ""){
+              alert('Please fill in all fields!');
+              return false;
+          }
+          if(newPassword.length < 8) {
+              alert("Password too short! (min. 8 characters)");
+              return false;
+          }
+
+          if(newPassword.length > 12) {
+              alert("Password too long! (max. 12 characters)");
+              return false;
+          }
+
+          if(newPassword !== repeatPassword) {
+              alert("Password confirmation does not match!");
+              return false;
+          }
+          return true;
+      }
+
+  </script>
+  <script type="text/javascript">
+      function change() {
+          var oldPassword = document.getElementById('old-password-input').value;
+          var newPassword = document.getElementById('new-password-input').value;
+          var repeatPassword = document.getElementById('repeat-password-input').value;
+          if(oldPassword.length >=1 && newPassword.length >=1 && repeatPassword.length >=1){
+              if(newPassword == repeatPassword){
+                  document.getElementById('save-changes-button').disabled = false;
+              }
+          }else{
+              document.getElementById('save-changes-button').disabled = true;
+          }
+      }
+  </script>
+
+</head>
+<body data-decimal-separator="," data-grouping-separator=".">
+
+<div role="navigation" aria-label="jumplinks">
+  <a href="#formheadline" class="accessibility">Zum Inhalt springen</a>
+</div>
+
+<header aria-labelledby="bannerheadline">
+  <a href="overview.html"><img class="title-image" src="../../images/big-logo-small.png" alt="BIG Smart Home logo"></a>
+
+  <h1 class="header-title" id="bannerheadline">
+    BIG Smart Home
+  </h1>
+  <nav aria-labelledby="navigationheadline">
+    <h2 class="accessibility" id="navigationheadline">Navigation</h2>
+    <ul class="navigation-list">
+      <li class="nav-items">
+        <ul>
+          <li>
+            <a href="login.html" class="button" accesskey="1">Abmelden</a>
+          </li>
+        </ul>
+      </li>
+      <li class="overflow-icon">
+        <a href="#" class="button" accesskey="1">☰</a>
+      </li>
+    </ul>
+  </nav>
+</header>
+<div class="main-container">
   <main aria-labelledby="formheadline">
-    <form class="form" method="post">
+    <form class="form" action="options.html" method="post" onsubmit="return value();">
       <h2 id="formheadline" class="options-headline">Passwort ändern</h2>
       <div class="form-row">
         <label class="form-label" for="old-password-input">
           Altes Passwort
         </label>
         <input type="password" name="password" id="old-password-input" required class="form-input"
-               placeholder="Altes Passwort">
+               placeholder="Altes Passwort" onkeyup="change();">
         <span id="old-password-error" class="error-text"></span>
       </div>
       <div class="form-row">
@@ -15,7 +94,7 @@
         </label>
         <input type="password" name="password" id="new-password-input" placeholder="Neues Passwort" required
                class="form-input" minlength="8"
-               maxlength="12" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}">
+               maxlength="12" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}" onkeyup="change();">
       </div>
       <div class="form-row">
         <label class="form-label" for="repeat-password-input">
@@ -23,13 +102,19 @@
         </label>
         <input type="password" name="password" id="repeat-password-input" placeholder="Neues Passwort wiederholen"
                required class="form-input" minlength="8"
-               maxlength="12" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}">
+               maxlength="12" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,12}" onkeyup="change();">
         <span id="new-password-error" class="error-text"></span>
       </div>
       <div class="form-row form-row-center">
-        <button id="save-changes-button" class="button button-submit">
+        <button id="save-changes-button" class="button button-submit" disabled>
           Änderung speichern
         </button>
       </div>
     </form>
   </main>
+</div>
+<footer>
+  © 2017 BIG Smart Home
+</footer>
+</body>
+</html>
