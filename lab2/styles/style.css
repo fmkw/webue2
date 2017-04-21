@@ -288,6 +288,7 @@ footer {
   overflow: hidden;
   display: flex;
   flex-basis: 100%;
+  cursor: pointer;
 }
 
 .device.highlight,

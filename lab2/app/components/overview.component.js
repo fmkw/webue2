@@ -10,19 +10,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var device_service_1 = require("../services/device.service");
+var router_1 = require("@angular/router");
 var OverviewComponent = (function () {
-    function OverviewComponent(deviceService) {
+    function OverviewComponent(deviceService, elRef, router) {
         var _this = this;
+        this.elRef = elRef;
+        this.router = router;
         deviceService.getDevices().then(function (result) {
             _this.devices = result;
         });
     }
+    OverviewComponent.prototype.onSelect = function (device) {
+        this.selectedDevice = (device === this.selectedDevice) ? null : device;
+    };
+    OverviewComponent.prototype.route = function (device) {
+        if (this.selectedDevice !== device)
+            this.router.navigate(['/details', device.id]);
+    };
     OverviewComponent = __decorate([
         core_1.Component({
             selector: 'overview',
             templateUrl: '/app/views/overview.html',
         }), 
-        __metadata('design:paramtypes', [device_service_1.DeviceService])
+        __metadata('design:paramtypes', [device_service_1.DeviceService, core_1.ElementRef, router_1.Router])
     ], OverviewComponent);
     return OverviewComponent;
 }());
