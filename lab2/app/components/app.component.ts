@@ -31,8 +31,17 @@ import {Router} from '@angular/router';
 export class AppComponent {
     showNavigation : boolean;
 
-    constructor(private router: Router) {
-        
+    constructor(
+        private router: Router
+    ) {
+
+        router.events.subscribe
+        (
+            (url:any) =>
+            {
+                this.showNavigation = url.url !== '/login';
+            }
+        );
     }
 
     checkPermission() {

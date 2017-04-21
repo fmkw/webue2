@@ -12,7 +12,11 @@ var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var AppComponent = (function () {
     function AppComponent(router) {
+        var _this = this;
         this.router = router;
+        router.events.subscribe(function (url) {
+            _this.showNavigation = url.url !== '/login';
+        });
     }
     AppComponent.prototype.checkPermission = function () {
         if (this.router.url != '/login')
