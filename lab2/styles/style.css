@@ -350,7 +350,8 @@ footer {
 .details-image, .details-image-enum {
   padding: 15px;
   box-sizing: border-box;
-  max-height: 380px;
+  max-height: 400px;
+  min-width: 400px;
   display: block;
 }
 

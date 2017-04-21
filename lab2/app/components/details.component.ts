@@ -3,7 +3,6 @@ import {Device} from "../model/device";
 import {DeviceService} from "../services/device.service";
 import {ActivatedRoute} from "@angular/router";
 import {ControlUnit} from "../model/controlUnit";
-import {ControlType} from '../model/controlType';
 import {BaseChartDirective} from "ng2-charts";
 
 @Component({
@@ -40,32 +39,36 @@ import {BaseChartDirective} from "ng2-charts";
     </div>
     <div *ngFor="let controlUnit of controlUnits" [ngSwitch]=controlUnit.type class="details-holder">
 
-      <div *ngSwitchCase="typeEnum.continuous" class="details-outer">
+      <div *ngSwitchCase="2" class="details-outer">
         <div class="details-image-container">
-          <img class="details-image" src="../../images/placeholder_continuous.PNG">
+          <canvas class="details-image-lineChart" baseChart height="400px" width="700px"
+                [datasets]="lineChartData"
+                [labels]="lineChartLabels"
+                [chartType]="lineChartType">
+            </canvas>
         </div>
         <div class="details-data">
           <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">6.3.2017 10:01:30: 20 -> 25
+          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{contLog}}
           </textarea>
           <div class="details-settings">
-            <h3 class="details-headline">Temperatur einstellen</h3>
+            <h3 class="details-headline">{{controlUnit.name}}</h3>
 
             <form class="update-form" method="post">
               <label class="update-form-field" id="current-value">
-                <span class="current-value">derzeit: 0</span>
+                <span class="current-value">derzeit: {{currentCont}}</span>
               </label>
               <label class="accessibility" for="new-value">Bitte gewünschten Wert eingeben.</label>
-              <input type="number" step="0.01" min="0" max="50" id="new-value" value="1"
+              <input [(ngModel)]="contInput" type="number" step="0.01" min="0" max="50" id="new-value" value="1"
                      class="update-form-field form-input" name="new-value" required>
-              <input type="submit" id="submit-value" class="update-form-field button" name="submit-value"
+              <input (click)="changeCont()" type="submit" id="submit-value" class="update-form-field button" name="submit-value"
                      value="Wert setzen">
             </form>
           </div>
         </div>
       </div>
 
-      <div *ngSwitchCase="typeEnum.enum" class="details-outer">
+      <div *ngSwitchCase="1" class="details-outer">
         <div class="details-image-container">
           <img class="details-image" src="../../images/placeholder_enum.PNG">
         </div>
@@ -90,7 +93,7 @@ import {BaseChartDirective} from "ng2-charts";
         </div>
       </div>
 
-      <div *ngSwitchCase="typeEnum.boolean" [ngSwitch]=controlUnit.current class="details-outer">
+      <div *ngSwitchCase="0" class="details-outer">
         <div class="details-image-container">
           <canvas class="details-image" baseChart
               [data]="doughnutChartData"
@@ -100,22 +103,19 @@ import {BaseChartDirective} from "ng2-charts";
         </div>
         <div class="details-data">
           <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea [(ngModel)]="boolLog" id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{boolLog}}</textarea>
+          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{boolLog}}</textarea>
           <div class="details-settings">
-            <h3 class="details-headline">Ein-/Ausschalten</h3>
+            <h3 class="details-headline">{{controlUnit.name}}</h3>
 
             <form class="update-form" method="post">
 
               <label class="update-form-field" id="current-value">
-                <span *ngSwitchCase="0" class="current-value">derzeit: Deaktiviert</span>
-                <span *ngSwitchCase="1" class="current-value">derzeit: Aktiviert</span>
+                <span class="current-value">derzeit: {{currentString}}</span>
               </label>
 
               <label class="accessibility" for="new-value">Bitte gewünschten Wert auswählen.</label>
-              <input type="checkbox" id="new-value" class="update-checkbox-input form-input"
-                     name="new-value" [(ngModel)]="checkBoxBool">
               <input (click)="changeBool()" type="submit" id="submit-value" class="update-form-field button" name="submit-value"
-                     value="Wert setzen">
+                     value="On/Off">
             </form>
           </div>
         </div>
@@ -126,25 +126,27 @@ import {BaseChartDirective} from "ng2-charts";
     providers: [DeviceService]
 })
 
-export class DetailsComponent implements OnInit{
+export class DetailsComponent{
     device: Device;
     controlUnits: [ControlUnit];
-    typeEnum = ControlType;
     id: string;
-    checkBoxBool: boolean = false;
-    @ViewChild(BaseChartDirective) chart: BaseChartDirective;
     boolLog: string = "";
-    boolCurrent: boolean;
+    contLog: string = "";
+    currentString: string;
+    currentCont: number;
+    contInput: number;
+    @ViewChild(BaseChartDirective) chart: BaseChartDirective;
 
     doughnutChartLabels: string[] = ['On', 'Off'];
-    doughnutChartData: number[] = [0, 0];
+    doughnutChartData: number[] = [4, 5];
     doughnutChartType: string = 'doughnut';
 
+    public lineChartData:Array<any>;
+    public lineChartLabels:Array<any>;
+    public lineChartLegend:boolean = true;
+    public lineChartType:string = 'line';
+
     constructor(private deviceService: DeviceService, private route: ActivatedRoute,) {
-
-    }
-
-    ngOnInit(): void {
         this.route.params
             .subscribe(params => {
                 this.id = params['id'];
@@ -152,23 +154,65 @@ export class DetailsComponent implements OnInit{
         this.deviceService.getDevice(this.id).then(device => {
             this.device = device;
             this.controlUnits = device.control_units;
+            for (let index = 0; index < this.controlUnits.length; ++index) {
+                let entry = this.controlUnits[index];
+                if(entry.type == 0){
+                    if(entry.current == 0){
+                        this.currentString = 'Deaktiviert';
+                    }else{
+                        this.currentString = 'Aktiviert';
+                    }
+                }else if(entry.type == 2){
+                    this.lineChartData = [{data: [entry.current], label: 'Verlauf'}];
+                    this.lineChartLabels = [this.formatDate(new Date)]
+                    this.currentCont = entry.current;
+                    this.contInput = entry.current;
+                }
+            }
         });
     }
 
     changeBool(): void{
         let from: string;
         let to: string;
-        if(this.checkBoxBool){
-            this.doughnutChartData[0]++;
+        if(this.currentString === 'Aktiviert'){
             from = 'An';
             to = 'Aus';
+            this.doughnutChartData[0]++;
+            this.currentString = 'Deaktiviert';
         }else{
-            this.doughnutChartData[1]++;
             from = 'Aus';
             to = 'An';
+            this.currentString = 'Aktiviert';
+            this.doughnutChartData[1]++;
         }
-        this.boolCurrent = false;
         this.boolLog += this.formatDate(new Date()) + ": " + from + " -> " + to +" \n";
+        setTimeout(() => {
+            let c = this.chart;
+            c.chart.destroy();
+            c.chart = c.getChartBuilder(c.ctx);
+        });
+    }
+
+    changeCont(): void{
+        let from: number = this.currentCont;
+        let to: number;
+        to = this.contInput;
+        this.currentCont = to;
+        let _data: Array<number> = new Array(this.lineChartData[0].data.length + 1);
+        for (let i = 0; i < _data.length - 1; i++){
+            _data[i] = this.lineChartData[0].data[i];
+        }
+        _data[_data.length - 1] = to;
+        this.lineChartData[0].data = _data;
+        let _labels: Array<string> = new Array(this.lineChartLabels.length + 1);
+        for (let i = 0; i < _labels.length - 1; i++){
+            _labels[i] = this.lineChartLabels[i];
+            console.log(_labels);
+        }
+        _labels[_labels.length - 1] = this.formatDate(new Date);
+        this.lineChartLabels = _labels;
+        this.contLog += this.formatDate(new Date()) + ": " + from + " -> " + to +" \n";
         setTimeout(() => {
             let c = this.chart;
             c.chart.destroy();
