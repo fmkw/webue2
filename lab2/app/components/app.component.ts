@@ -29,7 +29,7 @@ import {Router} from '@angular/router';
 })
 
 export class AppComponent {
-    showNavigation : boolean;
+    showNavigation = false;
 
     constructor(
         private router: Router
@@ -39,7 +39,7 @@ export class AppComponent {
         (
             (url:any) =>
             {
-                this.showNavigation = url.url !== '/login';
+                this.showNavigation = (url.url !== '/login' &&  url.url !== '/');
             }
         );
     }

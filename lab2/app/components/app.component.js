@@ -14,8 +14,9 @@ var AppComponent = (function () {
     function AppComponent(router) {
         var _this = this;
         this.router = router;
+        this.showNavigation = false;
         router.events.subscribe(function (url) {
-            _this.showNavigation = url.url !== '/login';
+            _this.showNavigation = (url.url !== '/login' && url.url !== '/');
         });
     }
     AppComponent.prototype.checkPermission = function () {
