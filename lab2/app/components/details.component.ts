@@ -1,13 +1,39 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Device} from "../model/device";
 import {DeviceService} from "../services/device.service";
 import {ActivatedRoute} from "@angular/router";
 import {ControlUnit} from "../model/controlUnit";
 import {ControlType} from '../model/controlType';
+import {BaseChartDirective} from "ng2-charts";
 
 @Component({
     selector: 'device-details',
     template: `
+    <aside class="sidebar" aria-labelledby="serverinfoheadline">
+    <div class="server-info-container">
+      <h2 class="accessibility" id="serverinfoheadline">Serverstatus</h2>
+      <dl class="server-data properties">
+        <dt class="accessibility">Serverstatus:</dt>
+        <dd class="server-status">Serverstatus:</dd>
+        <dt>Benutzer</dt>
+        <dd>
+          <span class="system-start-time">Administrator</span>
+        </dd>
+        <dt>Systemstartzeit</dt>
+        <dd>
+          <span class="system-start-time">10:00</span>
+        </dd>
+        <dt>Systemstartdatum</dt>
+        <dd>
+          <span class="system-start-datum">06.03.2017</span>
+        </dd>
+        <dt>Fehlgeschlagene Logins</dt>
+        <dd>
+          <span class="failed-logins">3</span>
+        </dd>
+      </dl>
+    </div>
+  </aside>
   <main aria-labelledby="deviceheadline" class="details-container">
     <div attr.data-device-id={{device?.id}} class="details-headline">
       <h2 class="main-headline" id="deviceheadline">{{device?.display_name}}</h2>
@@ -51,7 +77,7 @@ import {ControlType} from '../model/controlType';
 
             <form class="update-form" method="post">
               <label class="update-form-field" id="current-value">
-                <span class="current-value">derzeit: Standby</span>
+                <span class="current-value">derzeit: {{controlUnit.values[controlUnit.current]}}</span>
               </label>
               <label class="accessibility" for="new-value">Bitte gewünschten Wert aus Menü auswählen.</label>
               <select id="new-value" class="update-form-field form-input" name="new-value" required>
@@ -64,26 +90,31 @@ import {ControlType} from '../model/controlType';
         </div>
       </div>
 
-      <div *ngSwitchCase="typeEnum.boolean" class="details-outer">
+      <div *ngSwitchCase="typeEnum.boolean" [ngSwitch]=controlUnit.current class="details-outer">
         <div class="details-image-container">
-          <img class="details-image" src="../../images/placeholder_boolean.PNG">
+          <canvas class="details-image" baseChart
+              [data]="doughnutChartData"
+              [labels]="doughnutChartLabels"
+              [chartType]="doughnutChartType">
+          </canvas>
         </div>
         <div class="details-data">
           <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">6.3.2017 10:03:30: Aus -> An</textarea>
+          <textarea [(ngModel)]="boolLog" id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{boolLog}}</textarea>
           <div class="details-settings">
             <h3 class="details-headline">Ein-/Ausschalten</h3>
 
             <form class="update-form" method="post">
 
               <label class="update-form-field" id="current-value">
-                <span class="current-value">derzeit: Aktiviert</span>
+                <span *ngSwitchCase="0" class="current-value">derzeit: Deaktiviert</span>
+                <span *ngSwitchCase="1" class="current-value">derzeit: Aktiviert</span>
               </label>
 
               <label class="accessibility" for="new-value">Bitte gewünschten Wert auswählen.</label>
-              <input type="checkbox" id="new-value" class="update-checkbox-input form-input" checked
-                     name="new-value">
-              <input type="submit" id="submit-value" class="update-form-field button" name="submit-value"
+              <input type="checkbox" id="new-value" class="update-checkbox-input form-input"
+                     name="new-value" [(ngModel)]="checkBoxBool">
+              <input (click)="changeBool()" type="submit" id="submit-value" class="update-form-field button" name="submit-value"
                      value="Wert setzen">
             </form>
           </div>
@@ -100,6 +131,14 @@ export class DetailsComponent implements OnInit{
     controlUnits: [ControlUnit];
     typeEnum = ControlType;
     id: string;
+    checkBoxBool: boolean = false;
+    @ViewChild(BaseChartDirective) chart: BaseChartDirective;
+    boolLog: string = "";
+    boolCurrent: boolean;
+
+    doughnutChartLabels: string[] = ['On', 'Off'];
+    doughnutChartData: number[] = [0, 0];
+    doughnutChartType: string = 'doughnut';
 
     constructor(private deviceService: DeviceService, private route: ActivatedRoute,) {
 
@@ -114,5 +153,37 @@ export class DetailsComponent implements OnInit{
             this.device = device;
             this.controlUnits = device.control_units;
         });
+    }
+
+    changeBool(): void{
+        let from: string;
+        let to: string;
+        if(this.checkBoxBool){
+            this.doughnutChartData[0]++;
+            from = 'An';
+            to = 'Aus';
+        }else{
+            this.doughnutChartData[1]++;
+            from = 'Aus';
+            to = 'An';
+        }
+        this.boolCurrent = false;
+        this.boolLog += this.formatDate(new Date()) + ": " + from + " -> " + to +" \n";
+        setTimeout(() => {
+            let c = this.chart;
+            c.chart.destroy();
+            c.chart = c.getChartBuilder(c.ctx);
+        });
+    }
+
+    formatDate(date:Date) {
+
+        let day = date.getDate();
+        let month = date.getMonth();
+        let year = date.getFullYear();
+        let hour = date.getHours();
+        let minute = date.getMinutes();
+        let second = date.getSeconds();
+        return day + '.' + (month + 1) + '.' + year + ' ' + hour + ':' + minute +':' + second;
     }
 }

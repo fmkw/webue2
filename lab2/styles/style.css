@@ -513,6 +513,11 @@ footer {
   .device-outer {
     flex-basis: 100%;
   }
+
+  .details-image-container {
+    flex-basis: 100%;
+    align-self: center;
+  }
 }
 
 @media (min-width: 480px) and (max-width: 767px) {
