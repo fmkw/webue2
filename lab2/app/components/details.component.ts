@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {Device} from "../model/device";
 import {DeviceService} from "../services/device.service";
 import {ActivatedRoute} from "@angular/router";
+import {ControlUnit} from "../model/controlUnit";
+import {ControlType} from '../model/controlType';
 
 @Component({
     selector: 'device-details',
@@ -10,9 +12,9 @@ import {ActivatedRoute} from "@angular/router";
     <div attr.data-device-id={{device?.id}} class="details-headline">
       <h2 class="main-headline" id="deviceheadline">{{device?.display_name}}</h2>
     </div>
-    <div class="details-holder">
+    <div *ngFor="let controlUnit of controlUnits" [ngSwitch]=controlUnit.type class="details-holder">
 
-      <div class="details-outer">
+      <div *ngSwitchCase="typeEnum.continuous" class="details-outer">
         <div class="details-image-container">
           <img class="details-image" src="../../images/placeholder_continuous.PNG">
         </div>
@@ -37,7 +39,7 @@ import {ActivatedRoute} from "@angular/router";
         </div>
       </div>
 
-      <div class="details-outer">
+      <div *ngSwitchCase="typeEnum.enum" class="details-outer">
         <div class="details-image-container">
           <img class="details-image" src="../../images/placeholder_enum.PNG">
         </div>
@@ -53,9 +55,7 @@ import {ActivatedRoute} from "@angular/router";
               </label>
               <label class="accessibility" for="new-value">Bitte gewünschten Wert aus Menü auswählen.</label>
               <select id="new-value" class="update-form-field form-input" name="new-value" required>
-                <option>Aus</option>
-                <option>Ein</option>
-                <option selected>Standby</option>
+                <option *ngFor="let value of controlUnit.values">{{value}}</option>
               </select>
               <input type="submit" id="submit-value" class="update-form-field button" name="submit-value"
                      value="Wert setzen">
@@ -64,7 +64,7 @@ import {ActivatedRoute} from "@angular/router";
         </div>
       </div>
 
-      <div class="details-outer">
+      <div *ngSwitchCase="typeEnum.boolean" class="details-outer">
         <div class="details-image-container">
           <img class="details-image" src="../../images/placeholder_boolean.PNG">
         </div>
@@ -96,7 +96,9 @@ import {ActivatedRoute} from "@angular/router";
 })
 
 export class DetailsComponent implements OnInit{
-    public device: Device;
+    device: Device;
+    controlUnits: [ControlUnit];
+    typeEnum = ControlType;
     id: string;
 
     constructor(private deviceService: DeviceService, private route: ActivatedRoute,) {
@@ -110,7 +112,7 @@ export class DetailsComponent implements OnInit{
             });
         this.deviceService.getDevice(this.id).then(device => {
             this.device = device;
-            console.log(this.device);
+            this.controlUnits = device.control_units;
         });
     }
 }
