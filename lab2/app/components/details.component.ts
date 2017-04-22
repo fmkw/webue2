@@ -7,6 +7,7 @@ import {BaseChartDirective} from "ng2-charts";
 
 @Component({
     selector: 'device-details',
+    templateUrl: '',
     template: `
     <aside class="sidebar" aria-labelledby="serverinfoheadline">
     <div class="server-info-container">
@@ -194,15 +195,21 @@ export class DetailsComponent{
         });
     }
 
-    changeCont(): void{
+    changeCont(): void
+    {
+        if(this.contInput >50 || this.contInput < 0)
+            return;
+
         let from: number = this.currentCont;
         let to: number;
         to = this.contInput;
         this.currentCont = to;
+
         let _data: Array<number> = new Array(this.lineChartData[0].data.length + 1);
         for (let i = 0; i < _data.length - 1; i++){
             _data[i] = this.lineChartData[0].data[i];
         }
+
         _data[_data.length - 1] = to;
         this.lineChartData[0].data = _data;
         let _labels: Array<string> = new Array(this.lineChartLabels.length + 1);
@@ -210,9 +217,11 @@ export class DetailsComponent{
             _labels[i] = this.lineChartLabels[i];
             console.log(_labels);
         }
+
         _labels[_labels.length - 1] = this.formatDate(new Date);
         this.lineChartLabels = _labels;
         this.contLog += this.formatDate(new Date()) + ": " + from + " -> " + to +" \n";
+
         setTimeout(() => {
             let c = this.chart;
             c.chart.destroy();
