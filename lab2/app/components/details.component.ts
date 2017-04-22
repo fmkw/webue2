@@ -7,129 +7,15 @@ import {BaseChartDirective} from "ng2-charts";
 
 @Component({
     selector: 'device-details',
-    templateUrl: '',
-    template: `
-    <aside class="sidebar" aria-labelledby="serverinfoheadline">
-    <div class="server-info-container">
-      <h2 class="accessibility" id="serverinfoheadline">Serverstatus</h2>
-      <dl class="server-data properties">
-        <dt class="accessibility">Serverstatus:</dt>
-        <dd class="server-status">Serverstatus:</dd>
-        <dt>Benutzer</dt>
-        <dd>
-          <span class="system-start-time">Administrator</span>
-        </dd>
-        <dt>Systemstartzeit</dt>
-        <dd>
-          <span class="system-start-time">10:00</span>
-        </dd>
-        <dt>Systemstartdatum</dt>
-        <dd>
-          <span class="system-start-datum">06.03.2017</span>
-        </dd>
-        <dt>Fehlgeschlagene Logins</dt>
-        <dd>
-          <span class="failed-logins">3</span>
-        </dd>
-      </dl>
-    </div>
-  </aside>
-  <main aria-labelledby="deviceheadline" class="details-container">
-    <div attr.data-device-id={{device?.id}} class="details-headline">
-      <h2 class="main-headline" id="deviceheadline">{{device?.display_name}}</h2>
-    </div>
-    <div *ngFor="let controlUnit of controlUnits" [ngSwitch]=controlUnit.type class="details-holder">
-
-      <div *ngSwitchCase="2" class="details-outer">
-        <div class="details-image-container">
-          <canvas class="details-image-lineChart" baseChart height="400px" width="700px"
-                [datasets]="lineChartData"
-                [labels]="lineChartLabels"
-                [chartType]="lineChartType">
-            </canvas>
-        </div>
-        <div class="details-data">
-          <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{contLog}}
-          </textarea>
-          <div class="details-settings">
-            <h3 class="details-headline">{{controlUnit.name}}</h3>
-
-            <form class="update-form" method="post">
-              <label class="update-form-field" id="current-value">
-                <span class="current-value">derzeit: {{currentCont}}</span>
-              </label>
-              <label class="accessibility" for="new-value">Bitte gewünschten Wert eingeben.</label>
-              <input [(ngModel)]="contInput" type="number" step="0.01" min="0" max="50" id="new-value" value="1"
-                     class="update-form-field form-input" name="new-value" required>
-              <input (click)="changeCont()" type="submit" id="submit-value" class="update-form-field button" name="submit-value"
-                     value="Wert setzen">
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div *ngSwitchCase="1" class="details-outer">
-        <div class="details-image-container">
-          <img class="details-image" src="../../images/placeholder_enum.PNG">
-        </div>
-        <div class="details-data">
-          <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">6.3.2017 10:02:32: Ein -> Standby</textarea>
-          <div class="details-settings">
-            <h3 class="details-headline">Gerätezustand einstellen</h3>
-
-            <form class="update-form" method="post">
-              <label class="update-form-field" id="current-value">
-                <span class="current-value">derzeit: {{controlUnit.values[controlUnit.current]}}</span>
-              </label>
-              <label class="accessibility" for="new-value">Bitte gewünschten Wert aus Menü auswählen.</label>
-              <select id="new-value" class="update-form-field form-input" name="new-value" required>
-                <option *ngFor="let value of controlUnit.values">{{value}}</option>
-              </select>
-              <input type="submit" id="submit-value" class="update-form-field button" name="submit-value"
-                     value="Wert setzen">
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div *ngSwitchCase="0" class="details-outer">
-        <div class="details-image-container">
-          <canvas class="details-image" baseChart
-              [data]="doughnutChartData"
-              [labels]="doughnutChartLabels"
-              [chartType]="doughnutChartType">
-          </canvas>
-        </div>
-        <div class="details-data">
-          <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{boolLog}}</textarea>
-          <div class="details-settings">
-            <h3 class="details-headline">{{controlUnit.name}}</h3>
-
-            <form class="update-form" method="post">
-
-              <label class="update-form-field" id="current-value">
-                <span class="current-value">derzeit: {{currentString}}</span>
-              </label>
-
-              <label class="accessibility" for="new-value">Bitte gewünschten Wert auswählen.</label>
-              <input (click)="changeBool()" type="submit" id="submit-value" class="update-form-field button" name="submit-value"
-                     value="On/Off">
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-`,
+    templateUrl: '/app/views/details.html',
     providers: [DeviceService]
 })
 
 export class DetailsComponent{
     device: Device;
     controlUnits: [ControlUnit];
+    min : number;
+    max : number;
     id: string;
     boolLog: string = "";
     contLog: string = "";
@@ -147,7 +33,10 @@ export class DetailsComponent{
     public lineChartLegend:boolean = true;
     public lineChartType:string = 'line';
 
-    constructor(private deviceService: DeviceService, private route: ActivatedRoute,) {
+    constructor(
+        private deviceService: DeviceService,
+        private route: ActivatedRoute
+    ) {
         this.route.params
             .subscribe(params => {
                 this.id = params['id'];
@@ -155,7 +44,8 @@ export class DetailsComponent{
         this.deviceService.getDevice(this.id).then(device => {
             this.device = device;
             this.controlUnits = device.control_units;
-            for (let index = 0; index < this.controlUnits.length; ++index) {
+            for (let index = 0; index < this.controlUnits.length; ++index)
+            {
                 let entry = this.controlUnits[index];
                 if(entry.type == 0){
                     if(entry.current == 0){
@@ -169,6 +59,11 @@ export class DetailsComponent{
                     this.currentCont = entry.current;
                     this.contInput = entry.current;
                 }
+
+                if(entry.min != null)
+                    this.min = entry.min;
+                if(entry.max != null)
+                    this.max = entry.max;
             }
         });
     }
@@ -197,7 +92,7 @@ export class DetailsComponent{
 
     changeCont(): void
     {
-        if(this.contInput >50 || this.contInput < 0)
+        if(this.contInput < this.device.control_units[0].min || this.device.control_units[0].max < this.contInput)
             return;
 
         let from: number = this.currentCont;
