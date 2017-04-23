@@ -27,7 +27,7 @@ var AppComponent = (function () {
         core_1.Component({
             moduleId: module.id,
             selector: 'my-app',
-            template: "\n        <div role=\"navigation\" aria-label=\"jumplinks\">\n            <a href=\"#devicesheadline\" class=\"accessibility\">Zum Inhalt springen</a>\n        </div>\n        \n        <header aria-labelledby=\"bannerheadline\">\n            <a (click)=\"checkPermission()\"><img class=\"title-image\" src=\"../../images/big-logo-small.png\" alt=\"BIG Smart Home logo\"></a>\n        \n            <h1 class=\"header-title\" id=\"bannerheadline\">\n                BIG Smart Home\n            </h1>\n            <div *ngIf=\"showNavigation\">\n                <navigation></navigation>\n            </div>\n        </header>\n        <div class=\"main-container\">\n            <router-outlet></router-outlet>\n        </div>\n        <footer>\n            \u00A9 2017 BIG Smart Home\n        </footer>\n        ",
+            templateUrl: '/app/views/root.html',
         }), 
         __metadata('design:paramtypes', [router_1.Router])
     ], AppComponent);
