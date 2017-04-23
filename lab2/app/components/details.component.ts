@@ -44,6 +44,7 @@ import {BaseChartDirective} from "ng2-charts";
           <canvas class="details-image-lineChart" baseChart height="400px" width="700px"
                 [datasets]="lineChartData"
                 [labels]="lineChartLabels"
+                [legend]="lineChartLegend"
                 [chartType]="lineChartType">
             </canvas>
         </div>
@@ -70,13 +71,18 @@ import {BaseChartDirective} from "ng2-charts";
 
       <div *ngSwitchCase="1" class="details-outer">
         <div class="details-image-container">
-          <img class="details-image" src="../../images/placeholder_enum.PNG">
+          <canvas class="details-image" baseChart
+            [data]="polarAreaChartData"
+            [labels]="polarAreaChartLabels"
+            [legend]="polarAreaLegend"
+            [chartType]="polarAreaChartType">
+            </canvas>
         </div>
         <div class="details-data">
           <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">6.3.2017 10:02:32: Ein -> Standby</textarea>
+          <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{enumLog}}</textarea>
           <div class="details-settings">
-            <h3 class="details-headline">Gerätezustand einstellen</h3>
+            <h3 class="details-headline">{{controlUnit.name}}</h3>
 
             <form class="update-form" method="post">
               <label class="update-form-field" id="current-value">
@@ -132,8 +138,10 @@ export class DetailsComponent{
     id: string;
     boolLog: string = "";
     contLog: string = "";
+    enumLog: string = "";
     currentString: string;
     currentCont: number;
+    currentEnum: string;
     contInput: number;
     @ViewChild(BaseChartDirective) chart: BaseChartDirective;
 
@@ -141,10 +149,16 @@ export class DetailsComponent{
     doughnutChartData: number[] = [4, 5];
     doughnutChartType: string = 'doughnut';
 
-    public lineChartData:Array<any>;
-    public lineChartLabels:Array<any>;
-    public lineChartLegend:boolean = true;
-    public lineChartType:string = 'line';
+    lineChartData:Array<any>;
+    lineChartLabels:Array<any>;
+    lineChartLegend:boolean = true;
+    lineChartType:string = 'line';
+
+    polarAreaChartLabels:string[];
+    polarAreaChartData:number[];
+    polarAreaLegend:boolean = true;
+
+    polarAreaChartType:string = 'polarArea';
 
     constructor(private deviceService: DeviceService, private route: ActivatedRoute,) {
         this.route.params
@@ -167,6 +181,8 @@ export class DetailsComponent{
                     this.lineChartLabels = [this.formatDate(new Date)]
                     this.currentCont = entry.current;
                     this.contInput = entry.current;
+                }else if(entry.type == 1){
+                    this.polarAreaChartLabels = entry.values;
                 }
             }
         });
