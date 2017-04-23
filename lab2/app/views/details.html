@@ -35,6 +35,7 @@
         <canvas class="details-image-lineChart" baseChart height="400px" width="700px"
                 [datasets]="lineChartData"
                 [labels]="lineChartLabels"
+                [legend]="lineChartLegend"
                 [chartType]="lineChartType">
         </canvas>
       </div>
@@ -61,23 +62,28 @@
 
     <div *ngSwitchCase="1" class="details-outer">
       <div class="details-image-container">
-        <img class="details-image" src="../../images/placeholder_enum.PNG">
+        <canvas class="details-image" baseChart
+                [data]="polarAreaChartData"
+                [labels]="polarAreaChartLabels"
+                [legend]="polarAreaLegend"
+                [chartType]="polarAreaChartType">
+        </canvas>
       </div>
       <div class="details-data">
         <label class="accessibility" for="details-log">Letzte Werteänderungen</label>
-        <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">6.3.2017 10:02:32: Ein -> Standby</textarea>
+        <textarea id="details-log" class="detail-logs" placeholder="Gerätelog" readonly rows="6">{{enumLog}}</textarea>
         <div class="details-settings">
-          <h3 class="details-headline">Gerätezustand einstellen</h3>
+          <h3 class="details-headline">{{controlUnit.name}}</h3>
 
           <form class="update-form" method="post">
             <label class="update-form-field" id="current-value">
               <span class="current-value">derzeit: {{controlUnit.values[controlUnit.current]}}</span>
             </label>
             <label class="accessibility" for="new-value">Bitte gewünschten Wert aus Menü auswählen.</label>
-            <select id="new-value" class="update-form-field form-input" name="new-value" required>
+            <select [(ngModel)]="enumInput" id="new-value" class="update-form-field form-input" name="new-value" required>
               <option *ngFor="let value of controlUnit.values">{{value}}</option>
             </select>
-            <input type="submit" id="submit-value" class="update-form-field button" name="submit-value"
+            <input (click)="changeEnum()" type="submit" id="submit-value" class="update-form-field button" name="submit-value"
                    value="Wert setzen">
           </form>
         </div>
