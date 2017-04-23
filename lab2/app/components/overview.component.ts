@@ -10,6 +10,7 @@ import {defaultKeyValueDiffers} from "@angular/core/src/change_detection/change_
 })
 
 export class OverviewComponent {
+
     devices: Device[];
     selectedDevice: Device;
 
@@ -32,6 +33,18 @@ export class OverviewComponent {
     {
         if(this.selectedDevice !== device)
             this.router.navigate(['/details', device.id]);
+    }
+
+    ngAfterViewInit(): void {
+        for(let device of this.devices){
+            var controlUnit = device.control_units[0];
+            device.draw_image(device.id,
+                device.image,
+                controlUnit.min,
+                controlUnit.max,
+                controlUnit.current,
+                controlUnit.values);
+        }
     }
 
 }
