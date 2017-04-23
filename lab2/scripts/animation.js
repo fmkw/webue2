@@ -13,6 +13,26 @@
 
 
 function drawThermometer(id, src, min, max, current, values) {
+	$("#"+id).svg("destroy");
+    $("#"+id).svg({
+        loadURL:src,
+        onLoad:function (svg) {
+            svg.getElementById("tspan3817").textContent = ""+min;
+            svg.getElementById("tspan3817-6").textContent = ""+max;
+
+            if(current < min){
+                current = min;
+            }
+            if(current > max){
+                current = max;
+            }
+            var factor = (current-min)/(max-min);
+            var offset = 323.58843 - (factor*(323.58843 - 50));
+            var pathD = svg.getElementById("path3680").getAttribute("d");
+            var split = pathD.split("323.58843");
+            svg.change(svg.getElementById("path3680"),{d:split[0]+offset+split[1]});
+        }
+    });
   /* TODO
    Passen Sie die Höhe des Temperaturstandes entsprechend dem aktuellen Wert an.
    Beachten Sie weiters, dass auch die Beschriftung des Thermometers (max, min Temperatur) angepasst werden soll.
@@ -21,10 +41,30 @@ function drawThermometer(id, src, min, max, current, values) {
 
 
 function drawBulb(id, src, min, max, current, values) {
-  // TODO
+    $("#"+id).svg("destroy");
+    $("#"+id).svg({
+        loadURL:src,
+        onLoad:function (svg) {
+            if (current==1)
+            {svg.change(svg.root(), {fill: "yellow"});}
+        }
+    });
 }
 
 function drawCam(id, src, min, max, current, values) {
+	//CLONE FUNCTION NOT IMPLEMENTED YET!!!!!
+
+    $("#"+id).svg("destroy");
+    $("#"+id).svg({
+        loadURL:src,
+        onLoad:function (svg) {
+            if (current==0){ //webcam off
+                svg.change(svg.getElementById("circle8"),{style:"fill:black"});
+                svg.change(svg.getElementById("path10"),{style:"fill:white"});
+                //svg.clone($("#"+id));
+            }
+        }
+    });
   /* TODO
     Verändern Sie die Darstellung der Webcam entsprechend den Vorgaben aus der Angabe.
     Dabei soll jedoch nicht nur einfach die Farbe der Elemente verändert werden, sondern es soll eine Kopie der zu verändernden Elemente erstellt
@@ -33,5 +73,16 @@ function drawCam(id, src, min, max, current, values) {
 }
 
 function drawShutter(id, src, min, max, current, values) {
-  // TODO
+    $("#"+id).svg("destroy");
+    $("#"+id).svg({
+        loadURL:src,
+        onLoad:function (svg) {
+            if (current < 2) {
+                svg.change(svg.getElementById("path4559-2-5"), { fill: "none" });//Level 4
+                svg.change(svg.getElementById("path4559-2-6"), { fill: "none" })//Level 3
+            }
+            if (current < 1)
+                svg.change(svg.getElementById("path4559-2"), { fill: "none" });//Level 2
+        }
+    });
 }
